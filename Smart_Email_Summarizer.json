@@ -1,0 +1,143 @@
+{
+  "name": "Smart Email Summarizer",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -340,
+        -20
+      ],
+      "id": "76378453-8503-449c-ac03-ac11fe7e4805",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "P6pSONTRBhRw12xL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        200
+      ],
+      "id": "88c9d16c-2a7e-4dde-9564-5c6f39b33213",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "00JUsXMonOFlkAmm",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Summarize this email: {{ $json.From }}{{ $json.Subject }}{{ $json.snippet }} Keep it under 100 words.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        -20
+      ],
+      "id": "758234d8-3c51-4cda-b2a9-6a616a2e3e6c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "chatId": "5138771073",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -20
+      ],
+      "id": "a36641ff-8211-48f4-bd8b-e70a057aee6c",
+      "name": "Telegram",
+      "webhookId": "a1d0867b-16ff-424a-a0c5-bc7e11994b98",
+      "credentials": {
+        "telegramApi": {
+          "id": "PEaASb4581iszdQe",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ac640c98-17a7-444d-b50c-f1626c5a0008",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "44ecb7e2733209fe8cf7cfd8292687b1093b8464bb110cc2b3b117df33fbf111"
+  },
+  "id": "x2pHS5DJt4gIaLMH",
+  "tags": [
+    {
+      "createdAt": "2025-06-15T06:11:21.614Z",
+      "updatedAt": "2025-06-15T06:11:21.614Z",
+      "id": "q0KVCtnHP5C6ZHsy",
+      "name": "EmailSummarizer"
+    }
+  ]
+}
